@@ -6,6 +6,7 @@ import gsap from "gsap"
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { SparklesCore } from '@/components/ui/sparkles'
+import { Navbar } from '@/components/navbar'
 
 export const Route = createFileRoute('/')({
   loader: async () => {
@@ -36,21 +37,27 @@ export default function IndexPage() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-zinc-950 to-zinc-900 text-white px-6 py-12 space-y-24">
-      <section ref={heroRef} className="relative flex flex-col items-center justify-center text-center space-y-6">
-        <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight">
+    <div className="min-h-screen bg-gradient-to-b from-zinc-950 to-zinc-900 text-white px-6 py-8 space-y-24">
+      <Navbar />
+      <section
+        ref={heroRef}
+        className="relative flex flex-col items-center justify-center text-center space-y-6"
+      >
+        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 bg-clip-text text-transparent">
           Victor Tejada
         </h1>
         <p className="text-lg max-w-xl mx-auto text-muted-foreground">
           Ingeniero de software apasionado por crear experiencias modernas usando Go + React.
         </p>
-        <Button className="mt-4">Conoce más</Button>
+        <Button className="mt-4" asChild>
+          <a href="#about">Conoce más</a>
+        </Button>
         <div className="w-full h-40 absolute bottom-0">
           <SparklesCore background="transparent" minSize={0.4} maxSize={1.2} particleDensity={80} className="w-full h-full" />
         </div>
       </section>
 
-      <section ref={projectsRef} className="space-y-12">
+      <section ref={projectsRef} id="projects" className="space-y-12">
         <h2 className="text-3xl font-bold">📦 Proyectos Destacados</h2>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {projects.map((project: any) => (
@@ -64,7 +71,7 @@ export default function IndexPage() {
         </div>
       </section>
 
-      <section ref={postsRef} className="space-y-12">
+      <section ref={postsRef} id="posts" className="space-y-12">
         <h2 className="text-3xl font-bold">📝 Últimas Publicaciones</h2>
         <div className="space-y-4">
           {posts.map((post: any) => (
@@ -76,7 +83,7 @@ export default function IndexPage() {
         </div>
       </section>
 
-      <section ref={aboutRef} className="text-center max-w-2xl mx-auto">
+      <section ref={aboutRef} id="about" className="text-center max-w-2xl mx-auto">
         <h2 className="text-3xl font-bold mb-4">Sobre mí</h2>
         <p className="text-muted-foreground leading-relaxed">
           Me encanta combinar backend sólido con interfaces modernas. Este portafolio está construido con Go, TanStack Start, React 19 y animaciones suaves con GSAP.
