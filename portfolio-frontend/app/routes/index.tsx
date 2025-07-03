@@ -1,94 +1,62 @@
-// app/routes/index.tsx
-import { createFileRoute } from '@tanstack/react-router'
-import { fetchProjects, fetchPosts } from '@/lib/api'
-import { useEffect, useRef } from "react"
-import gsap from "gsap"
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { SparklesCore } from '@/components/ui/sparkles'
-import { Navbar } from '@/components/navbar'
 
-export const Route = createFileRoute('/')({
-  loader: async () => {
-    const [projects, posts] = await Promise.all([
-      fetchProjects(),
-      fetchPosts(),
-    ])
+import { useEffect, useRef } from 'react';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import Hero from '../components/Hero';
+import Projects from '../components/Projects';
+import Blog from '../components/Blog';
+import Skills from '../components/Skills';
+import Contact from '../components/Contact';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 
-    return { projects, posts }
-  },
-  component: IndexPage,
-})
+gsap.registerPlugin(ScrollTrigger);
 
-export default function IndexPage() {
-  const { projects, posts } = Route.useLoaderData()
-  const heroRef = useRef<HTMLDivElement>(null)
-  const aboutRef = useRef<HTMLDivElement>(null)
-  const projectsRef = useRef<HTMLDivElement>(null)
-  const postsRef = useRef<HTMLDivElement>(null)
+const Index = () => {
+  const mainRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const tl = gsap.timeline({ defaults: { ease: "power3.out", duration: 1 } })
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        '.fade-in-section',
+        { opacity: 0, y: 50 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1,
+          stagger: 0.2,
+          scrollTrigger: {
+            trigger: '.fade-in-section',
+            start: 'top 80%',
+            end: 'bottom 20%',
+            toggleActions: 'play none none reverse',
+          },
+        }
+      );
+    }, mainRef);
 
-    tl.fromTo(heroRef.current, { y: 100, opacity: 0 }, { y: 0, opacity: 1 })
-      .fromTo(aboutRef.current, { x: -100, opacity: 0 }, { x: 0, opacity: 1 }, "-=0.5")
-      .fromTo(projectsRef.current, { scale: 0.8, opacity: 0 }, { scale: 1, opacity: 1 }, "-=0.5")
-      .fromTo(postsRef.current, { x: 100, opacity: 0 }, { x: 0, opacity: 1 }, "-=0.5")
-  }, [])
+    return () => ctx.revert();
+  }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-zinc-950 to-zinc-900 text-white px-6 py-8 space-y-24">
+    <div ref={mainRef} className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       <Navbar />
-      <section
-        ref={heroRef}
-        className="relative flex flex-col items-center justify-center text-center space-y-6"
-      >
-        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 bg-clip-text text-transparent">
-          Victor Tejada
-        </h1>
-        <p className="text-lg max-w-xl mx-auto text-muted-foreground">
-          Ingeniero de software apasionado por crear experiencias modernas usando Go + React.
-        </p>
-        <Button className="mt-4" asChild>
-          <a href="#about">Conoce más</a>
-        </Button>
-        <div className="w-full h-40 absolute bottom-0">
-          <SparklesCore background="transparent" minSize={0.4} maxSize={1.2} particleDensity={80} className="w-full h-full" />
-        </div>
-      </section>
-
-      <section ref={projectsRef} id="projects" className="space-y-12">
-        <h2 className="text-3xl font-bold">📦 Proyectos Destacados</h2>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {projects.map((project: any) => (
-            <Card key={project.id} className="bg-zinc-800 border-none">
-              <CardContent className="space-y-2 p-4">
-                <h3 className="text-xl font-semibold">{project.name}</h3>
-                <p className="text-sm text-muted-foreground">{project.content}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      <section ref={postsRef} id="posts" className="space-y-12">
-        <h2 className="text-3xl font-bold">📝 Últimas Publicaciones</h2>
-        <div className="space-y-4">
-          {posts.map((post: any) => (
-            <div key={post.id} className="border-b border-zinc-700 pb-4">
-              <h4 className="text-lg font-semibold">{post.subject}</h4>
-              <p className="text-sm text-muted-foreground">{post.content}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section ref={aboutRef} id="about" className="text-center max-w-2xl mx-auto">
-        <h2 className="text-3xl font-bold mb-4">Sobre mí</h2>
-        <p className="text-muted-foreground leading-relaxed">
-          Me encanta combinar backend sólido con interfaces modernas. Este portafolio está construido con Go, TanStack Start, React 19 y animaciones suaves con GSAP.
-        </p>
-      </section>
+      <Hero />
+      <div className="fade-in-section">
+        <Projects />
+      </div>
+      <div className="fade-in-section">
+        <Blog />
+      </div>
+      <div className="fade-in-section">
+        <Skills />
+      </div>
+      <div className="fade-in-section">
+        <Contact />
+      </div>
+      <Footer />
     </div>
-  )
-}
+  );
+};
+
+export default Index;
