@@ -5,10 +5,15 @@
     "module": "ESNext",
     "target": "ES2022",
     "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
     "strictNullChecks": true,
+    "esModuleInterop": true,
     "baseUrl": ".",
     "paths": {
       "@/*": ["./app/*"]
     }
-  }
+  },
+  "include": ["app"],
+  "exclude": ["node_modules", "dist"]
 }

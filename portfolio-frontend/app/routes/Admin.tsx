@@ -9,7 +9,13 @@ import SkillManager from '../components/admin/SkillManager';
 import AuthorManager from '../components/admin/AuthorManager';
 import ContactMessages from '../components/admin/ContactMessages';
 
-const Admin = () => {
+import { createFileRoute } from '@tanstack/react-router';
+
+export const Route = createFileRoute('/Admin')({
+  component: Admin,
+});
+
+function Admin() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4 sm:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto">
@@ -67,6 +73,4 @@ const Admin = () => {
       </div>
     </div>
   );
-};
-
-export default Admin;
+}

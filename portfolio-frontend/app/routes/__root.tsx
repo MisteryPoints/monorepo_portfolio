@@ -17,8 +17,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // 5 min
-      gcTime: 10 * 60 * 1000,   // 10 min
+      staleTime: 10 * 60 * 1000,
+      gcTime: 15 * 60 * 1000,
+      retry: 1,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
     },
   },
 });
@@ -28,8 +31,17 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "description", content: "Victor Tejada — Full Stack Engineer specializing in Go, React, TypeScript, and distributed systems. Explore projects, technical skills, and engineering insights." },
+      { name: "keywords", content: "Full Stack Developer, Software Engineer, Go, React, TypeScript, Portfolio, Web Development, Backend, Frontend" },
+      { name: "author", content: "Victor Tejada" },
+      { property: "og:title", content: "Victor Tejada | Full Stack Engineer" },
+      { property: "og:description", content: "Engineering robust backends and immersive frontends. Merging deep technical logic with premium aesthetics." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Victor Tejada | Full Stack Engineer" },
+      { name: "twitter:description", content: "Engineering robust backends and immersive frontends." },
     ],
-    title: "Victor Tejada | Portfolio",
+    title: "Victor Tejada | Full Stack Engineer",
     links: [
       { rel: "stylesheet", href: appCss },
     ],
@@ -37,17 +49,20 @@ export const Route = createRootRoute({
   component: RootComponent,
 });
 
+import { TranslationProvider } from "@/lib/translations";
+
 function RootComponent() {
   return (
     <RootDocument>
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <QueryClientProvider client={queryClient}>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            {/* TanStack Router renderiza las rutas hijas aquí */}
-            <Outlet />
-          </TooltipProvider>
+          <TranslationProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <Outlet />
+            </TooltipProvider>
+          </TranslationProvider>
         </QueryClientProvider>
       </ThemeProvider>
     </RootDocument>

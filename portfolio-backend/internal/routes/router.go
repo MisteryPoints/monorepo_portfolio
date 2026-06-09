@@ -40,8 +40,10 @@ func SetupRoutes() *mux.Router {
 
 	// Skills
 	api.HandleFunc("/get-skills", handlers.GetSkills).Methods("GET")
+	api.HandleFunc("/get-skill-tree", handlers.GetSkillTree).Methods("GET")
 	api.HandleFunc("/add-skill", handlers.AddSkill).Methods("POST")
 	api.HandleFunc("/delete-skill", handlers.DeleteSkill).Methods("DELETE")
+	api.HandleFunc("/get-translations", handlers.GetTranslations).Methods("GET")
 
 	return r
 }

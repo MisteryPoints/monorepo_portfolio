@@ -29,28 +29,16 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-2">
             <Code className="h-8 w-8 text-purple-400" />
-            <span className="text-xl font-bold text-white">Portfolio</span>
+            <span className="text-xl font-bold text-white">Victor Tejada</span>
           </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <button onClick={() => scrollToSection('hero')} className="text-gray-300 hover:text-purple-400 transition-colors">
-              <User className="h-4 w-4 inline mr-2" />
-              About
-            </button>
-            <button onClick={() => scrollToSection('projects')} className="text-gray-300 hover:text-purple-400 transition-colors">
-              <Briefcase className="h-4 w-4 inline mr-2" />
-              Projects
-            </button>
-            <button onClick={() => scrollToSection('blog')} className="text-gray-300 hover:text-purple-400 transition-colors">
-              <BookOpen className="h-4 w-4 inline mr-2" />
-              Blog
-            </button>
-            <button onClick={() => scrollToSection('contact')} className="text-gray-300 hover:text-purple-400 transition-colors">
-              <Mail className="h-4 w-4 inline mr-2" />
-              Contact
-            </button>
-            <Link to="/admin">
+            <a href="#hero" className="text-gray-300 hover:text-purple-400 transition-colors cursor-pointer"><User className="h-4 w-4 inline mr-2" />About</a>
+            <a href="#projects" className="text-gray-300 hover:text-purple-400 transition-colors cursor-pointer"><Briefcase className="h-4 w-4 inline mr-2" />Projects</a>
+            <a href="#blog" className="text-gray-300 hover:text-purple-400 transition-colors cursor-pointer"><BookOpen className="h-4 w-4 inline mr-2" />Blog</a>
+            <a href="#contact" className="text-gray-300 hover:text-purple-400 transition-colors cursor-pointer"><Mail className="h-4 w-4 inline mr-2" />Contact</a>
+            <Link to="/Admin">
               <Button variant="outline" size="sm" className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white">
                 Admin
               </Button>
@@ -86,7 +74,7 @@ const Navbar = () => {
               <button onClick={() => scrollToSection('contact')} className="block px-3 py-2 text-gray-300 hover:text-purple-400">
                 Contact
               </button>
-              <Link to="/admin" className="block px-3 py-2 text-purple-400">
+              <Link to="/Admin" className="block px-3 py-2 text-purple-400">
                 Admin Panel
               </Link>
               <ModeToggle />
