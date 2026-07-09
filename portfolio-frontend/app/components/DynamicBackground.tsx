@@ -1,109 +1,37 @@
-
-import { useEffect, useMemo, useState } from "react";
-import Particles, { initParticlesEngine } from "@tsparticles/react";
-import { type Container, type ISourceOptions } from "@tsparticles/engine";
-import { loadSlim } from "@tsparticles/slim";
-
 const DynamicBackground = () => {
-  const [init, setInit] = useState(false);
+  return (
+    <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none bg-slate-950">
+      <div className="absolute inset-0 opacity-[0.02]" style={{
+        backgroundImage: [
+          'repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(168, 85, 247, 0.4) 59px, rgba(168, 85, 247, 0.4) 60px)',
+          'repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(168, 85, 247, 0.4) 59px, rgba(168, 85, 247, 0.4) 60px)',
+        ].join(', '),
+      }} />
 
-  useEffect(() => {
-    initParticlesEngine(async (engine) => {
-      await loadSlim(engine);
-    }).then(() => {
-      setInit(true);
-    });
-  }, []);
+      <div className="absolute inset-0 opacity-[0.015]" style={{
+        backgroundImage: [
+          'repeating-linear-gradient(90deg, transparent, transparent 29px, rgba(168, 85, 247, 0.2) 29px, rgba(168, 85, 247, 0.2) 30px)',
+          'repeating-linear-gradient(0deg, transparent, transparent 29px, rgba(168, 85, 247, 0.2) 29px, rgba(168, 85, 247, 0.2) 30px)',
+        ].join(', '),
+        backgroundPosition: '30px 30px',
+      }} />
 
-  const particlesLoaded = async (container?: Container): Promise<void> => {
-    console.log(container);
-  };
+      <div className="absolute inset-0 opacity-[0.04]" style={{
+        backgroundImage: 'radial-gradient(1.5px 1.5px at 30px 30px, rgba(168, 85, 247, 0.6) 50%, transparent 50%)',
+        backgroundSize: '60px 60px',
+      }} />
 
-  const options: ISourceOptions = useMemo(
-    () => ({
-      background: {
-        color: {
-          value: "transparent",
-        },
-      },
-      fpsLimit: 120,
-      interactivity: {
-        events: {
-          onClick: {
-            enable: true,
-            mode: "push",
-          },
-          onHover: {
-            enable: true,
-            mode: "grab",
-          },
-        },
-        modes: {
-          push: {
-            quantity: 4,
-          },
-          grab: {
-            distance: 200,
-            links: {
-              opacity: 0.5,
-            },
-          },
-        },
-      },
-      particles: {
-        color: {
-          value: "#8b5cf6",
-        },
-        links: {
-          color: "#8b5cf6",
-          distance: 150,
-          enable: true,
-          opacity: 0.2,
-          width: 1,
-        },
-        move: {
-          direction: "none",
-          enable: true,
-          outModes: {
-            default: "bounce",
-          },
-          random: false,
-          speed: 1,
-          straight: false,
-        },
-        number: {
-          density: {
-            enable: true,
-          },
-          value: 80,
-        },
-        opacity: {
-          value: 0.3,
-        },
-        shape: {
-          type: "circle",
-        },
-        size: {
-          value: { min: 1, max: 3 },
-        },
-      },
-      detectRetina: true,
-    }),
-    [],
-  );
+      <div className="absolute top-[25%] left-0 w-[2px] h-[2px] bg-purple-500/25 animate-data-horizontal" />
+      <div className="absolute top-[55%] left-0 w-[2px] h-[2px] bg-purple-500/20 animate-data-horizontal" style={{ animationDelay: '4s', animationDuration: '6s' }} />
+      <div className="absolute top-0 left-[30%] w-[2px] h-[2px] bg-purple-500/25 animate-data-vertical" />
+      <div className="absolute top-0 left-[70%] w-[2px] h-[2px] bg-purple-500/20 animate-data-vertical" style={{ animationDelay: '5s', animationDuration: '7s' }} />
 
-  if (init) {
-    return (
-      <Particles
-        id="tsparticles"
-        particlesLoaded={particlesLoaded}
-        options={options}
-        className="fixed inset-0 -z-10"
-      />
-    );
-  }
+      <div className="absolute top-6 left-6 w-10 h-10 border-t border-l border-purple-500/8" />
+      <div className="absolute top-6 right-6 w-10 h-10 border-t border-r border-purple-500/8" />
+      <div className="absolute bottom-6 left-6 w-10 h-10 border-b border-l border-purple-500/8" />
+      <div className="absolute bottom-6 right-6 w-10 h-10 border-b border-r border-purple-500/8" />
+    </div>
+  )
+}
 
-  return null;
-};
-
-export default DynamicBackground;
+export default DynamicBackground

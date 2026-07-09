@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from '@/lib/translations';
+import { useInView } from '@/hooks/use-in-view';
 
 const techUrls: Record<string, string> = {
   Golang: 'https://go.dev',
@@ -22,17 +21,19 @@ const techUrls: Record<string, string> = {
   Go: 'https://go.dev',
 };
 
-const SkillItem = ({ x, y, name }: { x: string, y: string, name: string }) => {
+const SkillItem = ({ x, y, name }: { x: string; y: string; name: string }) => {
   const url = techUrls[name];
   const Tag = url ? 'a' : 'div';
+  const [ref, inView] = useInView();
 
   return (
-    <motion.div
-      initial={{ x: 0, y: 0, opacity: 0 }}
-      whileInView={{ x, y, opacity: 1 }}
-      viewport={{ once: true }}
-      transition={{ duration: 1.5, type: 'spring' }}
-      className="absolute flex items-center justify-center"
+    <div
+      ref={ref}
+      className="absolute flex items-center justify-center transition-all duration-1000 ease-out"
+      style={{
+        transform: inView ? `translate(${x}, ${y})` : 'translate(0px, 0px)',
+        opacity: inView ? 1 : 0,
+      }}
     >
       <Tag
         {...(url ? { href: url, target: '_blank', rel: 'noopener noreferrer' } : {})}
@@ -47,63 +48,61 @@ const SkillItem = ({ x, y, name }: { x: string, y: string, name: string }) => {
           {url && <span className="ml-1 opacity-60">↗</span>}
         </div>
       </Tag>
-    </motion.div>
+    </div>
   );
 };
 
 const SkillWheel = () => {
   const { t } = useTranslation();
+  const [hubRef, hubInView] = useInView();
+  const [ring1Ref, ring1InView] = useInView();
+  const [ring2Ref, ring2InView] = useInView();
+  const [ring3Ref, ring3InView] = useInView();
 
   return (
     <div className="relative w-full h-[600px] flex items-center justify-center overflow-hidden py-20">
       <h2 className="absolute top-0 text-3xl font-bold text-white mb-10">{t('skills.title')}</h2>
 
-      {/* Central Hub */}
-      <motion.div
-        initial={{ scale: 0 }}
-        whileInView={{ scale: 1 }}
-        className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-600/30 to-pink-600/20 border-2 border-purple-500 flex items-center justify-center z-10 backdrop-blur-md shadow-[0_0_50px_rgba(168,85,247,0.3)]"
+      <div
+        ref={hubRef}
+        className={`w-24 h-24 rounded-full bg-gradient-to-br from-purple-600/30 to-pink-600/20 border-2 border-purple-500 flex items-center justify-center z-10 backdrop-blur-md shadow-[0_0_50px_rgba(168,85,247,0.3)] transition-all duration-700 ${
+          hubInView ? 'scale-100' : 'scale-0'
+        }`}
       >
-        <span className="text-white font-bold text-sm text-center leading-tight">Full<br/>Stack</span>
-      </motion.div>
+        <span className="text-white font-bold text-sm text-center leading-tight whitespace-pre-line">{t('skillWheel.center')}</span>
+      </div>
 
-      {/* Orbit Rings */}
-      <motion.div
-        initial={{ scale: 0 }}
-        whileInView={{ scale: 1 }}
-        transition={{ duration: 0.6 }}
-        className="absolute w-[200px] h-[200px] border border-slate-800 rounded-full"
+      <div
+        ref={ring1Ref}
+        className={`absolute w-[200px] h-[200px] border border-slate-800 rounded-full transition-all duration-600 ${
+          ring1InView ? 'scale-100' : 'scale-0'
+        }`}
       />
-      <motion.div
-        initial={{ scale: 0 }}
-        whileInView={{ scale: 1 }}
-        transition={{ duration: 0.8, delay: 0.2 }}
-        className="absolute w-[350px] h-[350px] border border-slate-800/50 rounded-full"
+      <div
+        ref={ring2Ref}
+        className={`absolute w-[350px] h-[350px] border border-slate-800/50 rounded-full transition-all duration-800 delay-200 ${
+          ring2InView ? 'scale-100' : 'scale-0'
+        }`}
       />
-      <motion.div
-        initial={{ scale: 0 }}
-        whileInView={{ scale: 1 }}
-        transition={{ duration: 1, delay: 0.4 }}
-        className="absolute w-[500px] h-[500px] border border-slate-800/30 rounded-full"
+      <div
+        ref={ring3Ref}
+        className={`absolute w-[500px] h-[500px] border border-slate-800/30 rounded-full transition-all duration-1000 delay-400 ${
+          ring3InView ? 'scale-100' : 'scale-0'
+        }`}
       />
 
-      {/* Skills Nodes */}
       <SkillItem name="Golang" x="-120px" y="-50px" />
       <SkillItem name="React" x="120px" y="-50px" />
       <SkillItem name="TypeScript" x="0px" y="-140px" />
       <SkillItem name="PostgreSQL" x="0px" y="140px" />
       <SkillItem name="Docker" x="-100px" y="100px" />
       <SkillItem name="Next.js" x="100px" y="100px" />
-
-      {/* Outer Ring */}
       <SkillItem name="AWS" x="-220px" y="-100px" />
       <SkillItem name="GSAP" x="220px" y="-100px" />
       <SkillItem name="Tailwind" x="-220px" y="100px" />
       <SkillItem name="Framer" x="220px" y="100px" />
       <SkillItem name="Redis" x="0px" y="-220px" />
       <SkillItem name="gRPC" x="0px" y="220px" />
-
-      {/* Extra outer nodes */}
       <SkillItem name="Python" x="-160px" y="-200px" />
       <SkillItem name="Kubernetes" x="160px" y="-200px" />
       <SkillItem name="SAS" x="-160px" y="200px" />

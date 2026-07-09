@@ -1,8 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, ChevronDown, Cpu, Globe, Database, Layout, Shield, Server, Code2, Braces, Container, GitMerge, Cloud, Lock, Terminal, Wrench } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ChevronRight, Cpu, Globe, Database, Layout, Shield, Server, Code2, Braces, Container, GitMerge, Cloud, Lock, Terminal, Wrench } from 'lucide-react';
 import { useState } from 'react';
 import { fetchWithCache } from '@/lib/api';
+import { useTranslation } from '@/lib/translations';
+import { useInView } from '@/hooks/use-in-view';
 
 interface SkillNode {
   id: string;
@@ -29,65 +31,63 @@ const IconMap: Record<string, any> = {
   typescript: Braces,
 };
 
-import { useTranslation } from '@/lib/translations';
-
 const TreeNode = ({ node, depth = 0 }: { node: SkillNode; depth?: number }) => {
   const [isOpen, setIsOpen] = useState(depth < 1);
   const hasChildren = node.children && node.children.length > 0;
   const Icon = IconMap[node.category?.toLowerCase() || 'core'] || Cpu;
+  const [nodeRef, nodeInView] = useInView();
 
   return (
-    <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: depth * 0.1 }}
-      className="relative"
+    <div
+      ref={nodeRef}
+      className={`relative transition-all duration-500 ease-out ${
+        nodeInView ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
+      }`}
+      style={{ transitionDelay: `${depth * 0.1}s` }}
     >
       {depth > 0 && (
         <div className="absolute left-[-1.5rem] top-0 w-6 h-full">
-          <div className="absolute left-0 top-1/2 w-full h-px bg-gradient-to-r from-purple-500/30 to-transparent" />
-          <div className="absolute left-0 top-0 w-px h-full bg-gradient-to-b from-purple-500/30 to-transparent" />
+          <div className="absolute left-0 top-1/2 w-full h-px bg-slate-700/50" />
+          <div className="absolute left-0 top-0 w-px h-full bg-slate-700/50" />
         </div>
       )}
 
-      <div className="ml-4 md:ml-8 border-l border-slate-800/50 pl-4 py-2 hover:border-l-purple-500/30 transition-colors duration-300">
+      <div className="ml-4 md:ml-8 border-l border-slate-800 pl-4 py-2">
         <div
-          className={`flex items-center gap-3 p-3 rounded-xl transition-all duration-300 cursor-pointer group
-            ${isOpen ? 'bg-slate-800/50 border-purple-500/40 shadow-[0_0_20px_rgba(168,85,247,0.1)]' : 'hover:bg-slate-800/20'} 
-            border border-transparent`}
+          className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-300 cursor-pointer ${
+            isOpen ? 'bg-slate-800/30' : 'hover:bg-slate-800/20'
+          }`}
           onClick={() => setIsOpen(!isOpen)}
         >
-          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-slate-900 border border-slate-700 group-hover:border-purple-500 text-purple-400 group-hover:text-purple-300 transition-all duration-300 shadow-lg group-hover:shadow-purple-500/20">
+          <div className="flex items-center justify-center w-8 h-8 rounded-md bg-slate-900 border border-slate-700 text-slate-400">
             {hasChildren ? (
-              <motion.div
-                animate={{ rotate: isOpen ? 90 : 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <ChevronRight size={16} />
-              </motion.div>
+              <div className={`transition-transform duration-200 ${isOpen ? 'rotate-90' : 'rotate-0'}`}>
+                <ChevronRight size={14} />
+              </div>
             ) : (
-              <div className="w-2 h-2 rounded-full bg-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.5)] group-hover:shadow-[0_0_12px_rgba(168,85,247,0.8)] transition-shadow" />
+              <div className="w-1.5 h-1.5 rounded-full bg-purple-500" />
             )}
           </div>
 
-          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 group-hover:border-purple-500/50 transition-all duration-300">
-            <Icon size={18} className="text-slate-400 group-hover:text-purple-300 transition-colors" />
+          <div className="flex items-center justify-center w-8 h-8 rounded-md bg-slate-900 border border-slate-700">
+            <Icon size={16} className="text-slate-400" />
           </div>
 
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between gap-4">
-              <span className="text-slate-200 font-medium group-hover:text-white truncate">{node.name}</span>
+              <span className="text-slate-300 font-medium text-sm truncate">{node.name}</span>
               {node.level != null && (
                 <div className="flex items-center gap-2 flex-shrink-0">
-                  <div className="w-24 h-2 bg-slate-900 rounded-full overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${node.level}%` }}
-                      transition={{ duration: 1.2, delay: 0.3 + depth * 0.1, ease: 'easeOut' }}
-                      className="h-full bg-gradient-to-r from-purple-500 via-pink-500 to-amber-500 rounded-full"
+                  <div className="w-20 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-purple-500/60 rounded-full transition-all duration-1000 ease-out"
+                      style={{
+                        width: nodeInView ? `${node.level}%` : '0%',
+                        transitionDelay: `${0.3 + depth * 0.1}s`,
+                      }}
                     />
                   </div>
-                  <span className="text-[10px] text-slate-500 font-mono tabular-nums">{node.level}%</span>
+                  <span className="text-[10px] text-slate-600 font-mono">{node.level}%</span>
                 </div>
               )}
             </div>
@@ -110,12 +110,15 @@ const TreeNode = ({ node, depth = 0 }: { node: SkillNode; depth?: number }) => {
           )}
         </AnimatePresence>
       </div>
-    </motion.div>
+    </div>
   );
 };
 
 const SkillTree = () => {
   const { t, lang } = useTranslation();
+  const [titleRef, titleInView] = useInView<HTMLHeadingElement>();
+  const [subtitleRef, subtitleInView] = useInView<HTMLParagraphElement>();
+
   const { data: skillTree, isLoading, isPlaceholderData } = useQuery<SkillNode[]>({
     queryKey: ['skillTree', lang],
     queryFn: () => fetchWithCache<SkillNode[]>(`/api/get-skill-tree?lang=${lang}`, `skillTree_${lang}`),
@@ -124,70 +127,49 @@ const SkillTree = () => {
 
   if (isLoading && !isPlaceholderData) {
     return (
-      <div className="max-w-4xl mx-auto p-8 animate-pulse">
-        {[...Array(4)].map((_, i) => (
-          <div key={i} className="h-16 bg-slate-900/50 rounded-lg mb-4 border border-slate-800" />
-        ))}
-      </div>
+      <section id="skills" className="py-20 px-4">
+        <div className="max-w-5xl mx-auto">
+          <div className="mb-8 text-center">
+            <div className="h-10 w-48 bg-slate-800/60 rounded mx-auto animate-pulse" />
+            <div className="h-3 w-36 bg-slate-800/40 rounded mx-auto mt-3 animate-pulse" />
+          </div>
+          <div className="max-w-4xl mx-auto animate-pulse space-y-3">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="h-14 bg-slate-900/50 rounded-lg" />
+            ))}
+          </div>
+        </div>
+      </section>
     );
   }
 
   return (
-    <section className="py-24 px-4 bg-slate-950/50 relative overflow-hidden">
-      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-purple-500/50 to-transparent" />
-      <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-pink-500/50 to-transparent" />
-      <div className="absolute left-1/4 top-0 w-px h-full bg-gradient-to-b from-purple-500/10 via-transparent to-purple-500/10" />
-      <div className="absolute right-1/4 top-0 w-px h-full bg-gradient-to-b from-pink-500/10 via-transparent to-pink-500/10" />
-
-      <div className="max-w-5xl mx-auto relative z-10">
-        <div className="mb-16 text-center">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            className="text-5xl md:text-6xl font-bold mb-4 tracking-tighter"
+    <section id="skills" className="py-20 px-4">
+      <div className="max-w-5xl mx-auto">
+        <div className="mb-12 text-center">
+          <h2
+            ref={titleRef}
+            className={`text-3xl md:text-4xl font-bold text-white mb-3 transition-all duration-700 ${
+              titleInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
+            }`}
           >
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-purple-200 to-slate-400">
-              {t('skills.title')}
-            </span>
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="text-slate-500 font-mono text-sm"
+            {t('skills.title')}
+          </h2>
+          <p
+            ref={subtitleRef}
+            className={`text-slate-500 text-sm transition-all duration-700 delay-200 ${
+              subtitleInView ? 'opacity-100' : 'opacity-0'
+            }`}
           >
             {t('skills.subtitle')}
-          </motion.p>
+          </p>
+          <div className="w-12 h-px bg-slate-700 mx-auto mt-4" />
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="bg-slate-900/30 backdrop-blur-xl rounded-2xl border border-slate-800/50 p-6 md:p-10 shadow-2xl hover:border-slate-700/50 transition-colors"
-        >
+        <div className="bg-slate-900/20 rounded-xl border border-slate-800/50 p-6">
           {skillTree?.map((root) => (
             <TreeNode key={root.id} node={root} />
           ))}
-        </motion.div>
-
-        <div className="mt-12 flex justify-center gap-8 text-slate-500 text-xs font-mono">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-2"
-          >
-            <div className="w-2 h-2 rounded-full bg-purple-500 shadow-[0_0_6px_rgba(168,85,247,0.5)]" />
-            <span>Mastered</span>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-2"
-          >
-            <div className="w-2 h-2 rounded-full bg-slate-700" />
-            <span>In Progress</span>
-          </motion.div>
         </div>
       </div>
     </section>

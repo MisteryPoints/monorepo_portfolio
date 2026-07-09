@@ -1,6 +1,6 @@
 
-import React, { useState, useEffect, useRef } from 'react';
-import { Terminal as TerminalIcon, X, Maximize2, Minimize2 } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Terminal as TerminalIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 import { useTranslation } from '@/lib/translations';
@@ -11,7 +11,7 @@ interface FSNode {
   children?: string[];
 }
 
-const virtualFS: Record<string, FSNode> = {
+const virtualFS_en: Record<string, FSNode> = {
   '/': { type: 'dir', children: ['projects/', 'blog/', 'skills/', 'contact/', 'about.txt', 'cv.pdf'] },
   '/projects': { type: 'dir', children: ['go-api.txt', 'react-dashboard.txt', 'data-pipeline.txt', 'portfolio.txt'] },
   '/projects/go-api.txt': { type: 'file', content: 'Go REST API with Gorilla Mux + GORM\n- High-throughput gRPC layer handling 50K+ req/s\n- PostgreSQL with optimized queries (15ms avg response)\n- CI/CD with GitHub Actions, Docker, Kubernetes' },
@@ -33,13 +33,41 @@ const virtualFS: Record<string, FSNode> = {
   '/contact/social.txt': { type: 'file', content: 'LinkedIn: www.linkedin.com/in/devpoint\nPortfolio: www.victortejada.dev\nGitHub: github.com/devpoint' },
 };
 
+const virtualFS_es: Record<string, FSNode> = {
+  '/': { type: 'dir', children: ['proyectos/', 'blog/', 'habilidades/', 'contacto/', 'acerca.txt', 'cv.pdf'] },
+  '/proyectos': { type: 'dir', children: ['api-go.txt', 'dashboard-react.txt', 'pipeta-datos.txt', 'portafolio.txt'] },
+  '/proyectos/api-go.txt': { type: 'file', content: 'API REST en Go con Gorilla Mux + GORM\n- Capa gRPC de alto rendimiento manejando 50K+ req/s\n- PostgreSQL con consultas optimizadas (15ms de respuesta promedio)\n- CI/CD con GitHub Actions, Docker, Kubernetes' },
+  '/proyectos/dashboard-react.txt': { type: 'file', content: 'Dashboard en React con TanStack Query\n- Renderizado del lado del servidor con TanStack Start\n- Animaciones Framer Motion reduciendo tasa de rebote 25%\n- TypeScript, Tailwind CSS, shadcn/ui' },
+  '/proyectos/pipeta-datos.txt': { type: 'file', content: 'Pipeta ETL Automatizada\n- Python/SAS procesando 1M+ registros diarios\n- Tiempo de procesamiento manual reducido 60%\n- Reportes en tiempo real con análisis predictivo' },
+  '/proyectos/portafolio.txt': { type: 'file', content: 'Portafolio Full Stack\n- Backend Go + Frontend React (TanStack Start)\n- PostgreSQL (Neon.tech), Cloudinary\n- i18n EN/ES, tema oscuro/claro, panel CRUD admin' },
+  '/blog': { type: 'dir', children: ['diseno-sistemas.txt', 'go-vs-node.txt', 'optimizacion.txt'] },
+  '/blog/diseno-sistemas.txt': { type: 'file', content: 'Diseño de Sistemas: Escalando a 1M Usuarios\n- Balanceo de carga, estrategias de caché (Redis)\n- Sharding y replicación de bases de datos\n- Trade-offs entre microservicios y monolitos' },
+  '/blog/go-vs-node.txt': { type: 'file', content: 'Go vs Node.js para Servicios Backend\n- Go: CPU 4.2GHz, 64GB RAM, 10ms latencia\n- Node.js: prototipado rápido, ecosistema rico\n- Marco de decisión para selección tecnológica' },
+  '/blog/optimizacion.txt': { type: 'file', content: 'Técnicas de Optimización de Bases de Datos\n- Estrategias de índices, planificación de consultas (15ms promedio)\n- Pool de conexiones, sentencias preparadas\n- Migrando de 200ms a 15ms de tiempo de respuesta' },
+  '/habilidades': { type: 'dir', children: ['frontend.txt', 'backend.txt', 'devops.txt', 'lenguajes.txt'] },
+  '/habilidades/frontend.txt': { type: 'file', content: 'Stack Frontend\n- React 18, TypeScript, TanStack Start\n- Framer Motion, Tailwind CSS v4\n- Librería de componentes shadcn/ui' },
+  '/habilidades/backend.txt': { type: 'file', content: 'Stack Backend\n- Go, Gorilla Mux, GORM\n- Node.js, Express, NestJS\n- Diseño de APIs RESTful y gRPC' },
+  '/habilidades/devops.txt': { type: 'file', content: 'DevOps e Infraestructura\n- Docker, Kubernetes, CI/CD\n- PostgreSQL, Redis, Cloudinary\n- Despliegue en la nube (Neon.tech, AWS)' },
+  '/habilidades/lenguajes.txt': { type: 'file', content: 'Lenguajes de Programación\n- Go, TypeScript, JavaScript\n- Python, SAS, SQL\n- Java, C#, .NET' },
+  '/contacto': { type: 'dir', children: ['email.txt', 'telefono.txt', 'social.txt'] },
+  '/contacto/email.txt': { type: 'file', content: 'Email: info@victortejada.dev' },
+  '/contacto/telefono.txt': { type: 'file', content: 'Teléfono/WhatsApp: +1 (809) 729-8392\nWhatsApp: https://wa.me/18097298392' },
+  '/contacto/social.txt': { type: 'file', content: 'LinkedIn: www.linkedin.com/in/devpoint\nPortafolio: www.victortejada.dev\nGitHub: github.com/devpoint' },
+};
+
 const Terminal = () => {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const [history, setHistory] = useState<string[]>([t('terminal.welcome')]);
   const [input, setInput] = useState('');
   const [cwd, setCwd] = useState('/');
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const fs = lang === 'es' ? virtualFS_es : virtualFS_en;
+
+  useEffect(() => {
+    setHistory(prev => [t('terminal.welcome'), ...prev.slice(1)]);
+  }, [lang]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -60,16 +88,16 @@ const Terminal = () => {
   };
 
   const listDir = (path: string): string[] => {
-    const node = virtualFS[path];
+    const node = fs[path];
     if (node?.type === 'dir') return node.children || [];
     const parent = path.substring(0, path.lastIndexOf('/')) || '/';
-    const pNode = virtualFS[parent];
+    const pNode = fs[parent];
     return pNode?.children || [];
   };
 
   const getPrompt = () => {
     const dir = cwd === '/' ? '~' : '~' + cwd;
-    return `guest@antigravity:${dir}$`;
+    return `${t('terminal.prompt').replace('~', dir)} `;
   };
 
   const handleCommand = (e: React.FormEvent) => {
@@ -80,7 +108,7 @@ const Terminal = () => {
     let output = '';
 
     if (cmd === 'clear') {
-      setHistory([]);
+      setHistory([t('terminal.welcome')]);
       setCwd('/');
       setInput('');
       return;
@@ -88,14 +116,14 @@ const Terminal = () => {
 
     switch (cmd) {
       case 'help':
-        output = 'Available commands: help, ls, cd <dir>, cat <file>, pwd, clear, whoami, version, status';
+        output = t('terminal.help');
         break;
 
       case 'ls': {
         const target = args[0] ? resolvePath(args[0]) : cwd;
         const children = listDir(target);
         if (children.length === 0) {
-          output = `ls: ${target}: No such directory`;
+          output = `ls: ${target}: ${t('terminal.noSuchDir')}`;
         } else {
           output = children.join('  ');
         }
@@ -105,9 +133,9 @@ const Terminal = () => {
       case 'cd': {
         const target = args[0] || '/';
         const resolved = resolvePath(target);
-        const node = virtualFS[resolved];
+        const node = fs[resolved];
         if (!node || node.type !== 'dir') {
-          output = `cd: ${target}: No such directory`;
+          output = `cd: ${target}: ${t('terminal.noSuchDir')}`;
         } else {
           setCwd(resolved);
         }
@@ -121,13 +149,13 @@ const Terminal = () => {
       case 'cat': {
         const file = args[0];
         if (!file) {
-          output = 'cat: missing operand';
+          output = t('terminal.missingOperand');
           break;
         }
         const resolved = file.startsWith('/') ? file : (cwd === '/' ? '/' + file : cwd + '/' + file);
-        const node = virtualFS[resolved];
+        const node = fs[resolved];
         if (!node || node.type !== 'file') {
-          output = `cat: ${file}: No such file or directory`;
+          output = `cat: ${file}: ${t('terminal.noSuchFile')}`;
         } else {
           output = node.content || '';
         }
@@ -135,19 +163,19 @@ const Terminal = () => {
       }
 
       case 'whoami':
-        output = 'Lead Full Stack Developer | DSA Enthusiast | AI Integrator';
+        output = t('terminal.whoami');
         break;
 
       case 'version':
-        output = 'DevOS v2.4.0-stable (build 2026-05-11)';
+        output = t('terminal.version');
         break;
 
       case 'status':
-        output = 'System: Online\nUptime: 1,440 hours\nCPU: 4.2GHz\nRAM: 64GB';
+        output = t('terminal.status');
         break;
 
       default:
-        output = `Command not found: ${cmd}. Type "help" for assistance.`;
+        output = `${t('terminal.cmdNotFound')}: ${cmd}. Type "help" for assistance.`;
     }
 
     if (output) {
@@ -166,7 +194,6 @@ const Terminal = () => {
           whileInView={{ opacity: 1, scale: 1 }}
           className="bg-[#0f172a] rounded-xl overflow-hidden border border-slate-800 shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
         >
-          {/* Terminal Header */}
           <div className="bg-slate-900 px-4 py-2 flex items-center justify-between border-b border-slate-800">
             <div className="flex items-center gap-2">
               <div className="flex gap-1.5">
@@ -176,12 +203,11 @@ const Terminal = () => {
               </div>
               <div className="ml-4 flex items-center gap-2 text-slate-400 text-xs font-mono">
                 <TerminalIcon size={14} />
-                <span>bash — dev@portfolio — 80x24</span>
+                <span>{t('terminal.header')}</span>
               </div>
             </div>
           </div>
 
-          {/* Terminal Body */}
           <div 
             ref={scrollRef}
             className="h-[400px] p-6 font-mono text-sm overflow-y-auto bg-slate-950/50 backdrop-blur-sm"

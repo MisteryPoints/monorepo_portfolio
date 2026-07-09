@@ -2,3 +2,5 @@
 *.exe
 count.txt
 *.timestamp_*.js
+deploy/.env
+*.local

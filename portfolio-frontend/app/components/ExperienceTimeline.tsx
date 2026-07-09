@@ -1,9 +1,17 @@
-import { useRef } from 'react';
-import { motion, useScroll, useSpring } from 'framer-motion';
+import { useTranslation } from '@/lib/translations';
 
-const experienceData = [
+interface Experience {
+  position: string;
+  company: string;
+  companyLink: string;
+  time: string;
+  address: string;
+  work: string[];
+}
+
+const experienceData_en: Experience[] = [
   {
-    position: "Analista Sr Gestiones de Cobros",
+    position: "Senior Software Engineer — Accounts Receivable Automation",
     company: "Claro RD",
     companyLink: "https://www.claro.com.do",
     time: "Aug 2024 — Present",
@@ -18,7 +26,7 @@ const experienceData = [
     ]
   },
   {
-    position: "ING II Operaciones Móviles",
+    position: "Software Engineer II — Mobile Operations & Internal Tools",
     company: "Claro RD",
     companyLink: "https://www.claro.com.do",
     time: "Dec 2023 — Aug 2024",
@@ -31,7 +39,7 @@ const experienceData = [
     ]
   },
   {
-    position: "Analista de Operaciones Móviles",
+    position: "Software Engineer — Mobile Operations & Data Analytics",
     company: "Claro RD",
     companyLink: "https://www.claro.com.do",
     time: "Sep 2020 — Dec 2023",
@@ -43,7 +51,7 @@ const experienceData = [
     ]
   },
   {
-    position: "Analista Prevencion y Proyectos Móviles",
+    position: "Software Engineer — Mobile Projects & Reliability",
     company: "Claro RD",
     companyLink: "https://www.claro.com.do",
     time: "Mar 2018 — Sep 2020",
@@ -55,7 +63,7 @@ const experienceData = [
     ]
   },
   {
-    position: "Software Developer",
+    position: "Full-Stack Developer",
     company: "Quickarr",
     companyLink: "#",
     time: "May 2017 — Mar 2018",
@@ -66,7 +74,7 @@ const experienceData = [
     ]
   },
   {
-    position: "IT Intern",
+    position: "Software Engineering Intern",
     company: "Laboratorios Rowe",
     companyLink: "#",
     time: "Feb 2017 — May 2017",
@@ -78,77 +86,133 @@ const experienceData = [
   }
 ];
 
-const Details = ({ position, company, companyLink, time, address, work }: {
-  position: string;
-  company: string;
-  companyLink: string;
-  time: string;
-  address: string;
-  work: string[];
-}) => {
-  const ref = useRef(null);
+const experienceData_es: Experience[] = [
+  {
+    position: "Ingeniero de Software Senior — Automatización de Cuentas por Cobrar",
+    company: "Claro RD",
+    companyLink: "https://www.claro.com.do",
+    time: "Ago 2024 — Presente",
+    address: "Remoto",
+    work: [
+      "Mantuve y optimicé el ciclo automatizado de asignación de cuentas por cobrar para gestores usando SAS y Python para garantizar eficiencia",
+      "Desarrollé informes automatizados generando reportes estratégicos en tiempo real, apoyando decisiones operativas",
+      "Cumplí con regulaciones del Instituto Dominicano de las Telecomunicaciones (Indotel), integrando validaciones regulatorias en los procesos para reducir riesgos",
+      "Automaticé la gestión de carteras de clientes y gestores legales, mejorando la distribución de casos y la priorización de cobros",
+      "Diseñé sistemas analíticos y automatizados con SAS, procedimientos y Python (Selenium), mejorando el IVR de cobros con reportes predictivos, generando +$3MM en recuperaciones (+20% eficiencia)",
+      "Implementé contacto omnicanal (SMS/email/WhatsApp) con plantillas dinámicas, reduciendo cancelaciones involuntarias en 15% y optimizando la asignación de casos en 30%"
+    ]
+  },
+  {
+    position: "Ingeniero de Software II — Operaciones Móviles y Herramientas Internas",
+    company: "Claro RD",
+    companyLink: "https://www.claro.com.do",
+    time: "Dic 2023 — Ago 2024",
+    address: "Santo Domingo, DN, República Dominicana",
+    work: [
+      "Desarrollé un portal de documentación interna usando React, Next.js y Go, reduciendo tiempos de capacitación en 40%",
+      "Implementé sistemas proactivos de detección de fallas con alertas automatizadas, reduciendo tiempo de resolución de incidentes en 60% y eliminando discrepancias de paquetes de datos que generaban pérdidas de +$50K anuales",
+      "Aseguré el aprovisionamiento de líneas y servicios de Voz/Datos/SMS con validaciones automatizadas, mejorando la experiencia del cliente final",
+      "Lideré el desarrollo de soluciones para una cola de transacciones de aprovisionamiento, reduciendo la probabilidad de problemas de aprovisionamiento en 40%"
+    ]
+  },
+  {
+    position: "Ingeniero de Software — Operaciones Móviles y Analítica de Datos",
+    company: "Claro RD",
+    companyLink: "https://www.claro.com.do",
+    time: "Sep 2020 — Dic 2023",
+    address: "Santo Domingo, DN, República Dominicana",
+    work: [
+      "Diseñé sistemas de inventario numérico usando SAS, SQL y APIs XML, logrando 99.7% de precisión en inventario de 5M+ números, reduciendo discrepancias en 28%",
+      "Automaticé procesos con VBA y Macros SAS, reduciendo tiempos de reportes en 50%, y desarrollé dashboards HTML interactivos para decisiones operativas",
+      "Implementé pipelines de validación reduciendo errores en servicios móviles en 30%, generando 700+ horas de ahorro anuales y apoyando reducción de 20% en incidentes de aprovisionamiento"
+    ]
+  },
+  {
+    position: "Ingeniero de Software — Proyectos Móviles y Confiabilidad",
+    company: "Claro RD",
+    companyLink: "https://www.claro.com.do",
+    time: "Mar 2018 — Sep 2020",
+    address: "Santo Domingo, DN, República Dominicana",
+    work: [
+      "Coordiné la resolución de interrupciones de producción, reduciendo incidentes críticos en 30% y tiempo de inactividad en 40% mediante soporte nocturno y rollbacks",
+      "Asistí al equipo de Desarrollo en la implementación de soluciones móviles, previniendo interrupciones de aprovisionamiento móvil y mejorando la incidencia de casos reportados en 30%",
+      "Participé en proyectos móviles con pruebas automatizadas (Postman, CI/CD), reduciendo caídas en 60% y ahorrando $50K anuales en interrupciones"
+    ]
+  },
+  {
+    position: "Desarrollador Full-Stack",
+    company: "Quickarr",
+    companyLink: "#",
+    time: "May 2017 — Mar 2018",
+    address: "Santo Domingo, DN, República Dominicana",
+    work: [
+      "Desarrollé un sistema de facturación con JavaScript y Go, integrando inventario y dashboards con conexión a base de datos, aumentando la eficiencia operativa en 40% y ganancias en 25% (+$17K)",
+      "Reduje errores contables con datos en tiempo real y planificación de compras automatizada, evitando desabastecimientos"
+    ]
+  },
+  {
+    position: "Pasante de Ingeniería de Software",
+    company: "Laboratorios Rowe",
+    companyLink: "#",
+    time: "Feb 2017 — May 2017",
+    address: "Los Alcarrizos, Santo Domingo, República Dominicana",
+    work: [
+      "Colaboré en una aplicación de inventario en Java, conectándola a FinTech para precios y mantenimiento de PLC/maquinaria, reduciendo tiempo de inactividad en 25% ($2,500/hora) y costos correctivos en 20%",
+      "Mejoré la eficiencia operativa en 10-20% y facilité el cumplimiento regulatorio con trazabilidad"
+    ]
+  }
+];
+
+const TimelineItem = ({ position, company, companyLink, time, address, work }: Experience) => {
   return (
-    <li ref={ref} className="my-8 first:mt-0 last:mb-0 w-[60%] mx-auto flex flex-col items-start justify-between">
-      <motion.div
-        initial={{ y: 50, opacity: 0 }}
-        whileInView={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5, type: 'spring' }}
-      >
-        <h3 className="capitalize font-bold text-2xl text-white">
-          {position}&nbsp;
-          <a href={companyLink} target="_blank" className="text-purple-500 capitalize">
+    <div className="relative pl-8 pb-12 last:pb-0">
+      <div className="absolute left-0 top-1 w-3 h-3 rounded-full bg-purple-500 border-2 border-slate-950 z-10" />
+      <div className="absolute left-[5px] top-3 bottom-0 w-px bg-slate-800" />
+
+      <div>
+        <h3 className="text-lg font-semibold text-white">
+          {position}{' '}
+          <a href={companyLink} target="_blank" rel="noreferrer" className="text-purple-400 hover:underline">
             @{company}
           </a>
         </h3>
-        <span className="capitalize font-medium text-slate-400">
+        <span className="text-sm text-slate-500">
           {time} | {address}
         </span>
-        <ul className="mt-4 space-y-2">
+        <ul className="mt-3 space-y-1.5">
           {work.map((item, i) => (
-            <li key={i} className="flex items-start gap-2 text-slate-300">
-              <span className="text-purple-400 mt-1.5 flex-shrink-0">▸</span>
+            <li key={i} className="flex items-start gap-2 text-sm text-slate-400">
+              <span className="text-purple-400 mt-1 flex-shrink-0">▸</span>
               <span>{item}</span>
             </li>
           ))}
         </ul>
-      </motion.div>
-    </li>
+      </div>
+    </div>
   );
 };
 
 const ExperienceTimeline = () => {
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ['start end', 'center start']
-  });
-
-  const scaleY = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30
-  });
+  const { t, lang } = useTranslation();
+  const data = lang === 'es' ? experienceData_es : experienceData_en;
 
   return (
-    <div className="my-40">
-      <h2 className="font-bold text-5xl md:text-7xl mb-32 w-full text-center">
-        <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
-          Experience
-        </span>
-      </h2>
+    <section id="experience" className="py-20 px-4">
+      <div className="max-w-4xl mx-auto">
+        <div className="mb-12 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
+            {t('experience.title')}
+          </h2>
+          <div className="w-12 h-px bg-slate-700 mx-auto" />
+        </div>
 
-      <div ref={ref} className="w-[75%] mx-auto relative">
-        <motion.div
-          style={{ scaleY }}
-          className="absolute left-9 top-0 w-[4px] h-full bg-gradient-to-b from-purple-500 via-pink-500 to-purple-500 origin-top shadow-[0_0_20px_rgba(168,85,247,0.5)]"
-        />
-
-        <ul className="w-full flex flex-col items-start justify-between ml-4">
-          {experienceData.map((exp, i) => (
-            <Details key={i} {...exp} />
+        <div className="max-w-2xl mx-auto">
+          {data.map((exp, i) => (
+            <TimelineItem key={i} {...exp} />
           ))}
-        </ul>
+        </div>
       </div>
-    </div>
+    </section>
   );
 };
 

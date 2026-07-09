@@ -1,8 +1,7 @@
-import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Github, ExternalLink, Calendar } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Github, ExternalLink } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { fetchWithCache } from '@/lib/api';
@@ -19,7 +18,6 @@ interface Project {
 }
 
 import { useTranslation } from '@/lib/translations';
-import { AnimatedTooltip } from './AnimatedTooltip';
 
 const Projects = () => {
   const { t, lang } = useTranslation();
@@ -33,13 +31,13 @@ const Projects = () => {
 
   if (isLoading && !isPlaceholderData) {
     return (
-      <section id="projects" className="py-20 px-4 sm:px-6 lg:px-8">
+      <section id="projects" className="py-20 px-4">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl font-bold text-center text-white mb-16">{t('projects.title')}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <h2 className="text-3xl font-bold text-center text-white mb-12">{t('projects.title')}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
               <div key={i} className="animate-pulse">
-                <div className="bg-slate-800 rounded-lg h-64"></div>
+                <div className="bg-slate-800 rounded-lg h-48"></div>
               </div>
             ))}
           </div>
@@ -49,73 +47,64 @@ const Projects = () => {
   }
 
   return (
-    <section id="projects" className="py-20 px-4 sm:px-6 lg:px-8">
+    <section id="projects" className="py-20 px-4">
       <div className="max-w-7xl mx-auto">
-        <h2 className="text-4xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 mb-16">
-          {t('projects.title')}
-        </h2>
+        <div className="mb-12 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
+            {t('projects.title')}
+          </h2>
+          <div className="w-12 h-px bg-slate-700 mx-auto" />
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {projects?.map((project) => (
-            <motion.div
+            <div
               key={project.id}
-              layout
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              className="bg-slate-900/40 border border-slate-800 rounded-2xl overflow-hidden group hover:border-purple-500/50 transition-all duration-500 cursor-pointer"
+              className="bg-slate-900/30 border border-slate-800 rounded-xl overflow-hidden hover:border-slate-700 transition-all duration-300"
               onClick={() => project.url && window.open(project.url, '_blank')}
             >
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid md:grid-cols-2">
                 <div className="aspect-square md:aspect-auto relative overflow-hidden">
                   <img
                     src={project.images?.[0] || 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=2070&auto=format&fit=crop'}
                     alt={project.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-60" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-50" />
                 </div>
 
-                <div className="p-8 flex flex-col justify-between">
+                <div className="p-6 flex flex-col justify-between">
                   <div>
-                    <div className="flex items-center gap-2 mb-4">
-                      {project.technologies?.slice(0, 5).map((tech, i) => (
-                        <Badge key={i} variant="secondary" className="bg-purple-900/30 text-purple-400 border-purple-500/20">
+                    <div className="flex items-center gap-2 mb-3 flex-wrap">
+                      {project.technologies?.slice(0, 4).map((tech, i) => (
+                        <Badge key={i} variant="secondary" className="bg-slate-800 text-slate-400 border-slate-700 text-[10px]">
                           {tech.name}
                         </Badge>
                       ))}
                     </div>
 
-                    <h3 className="text-3xl font-bold text-white mb-4 group-hover:text-purple-400 transition-colors">
+                    <h3 className="text-xl font-semibold text-white mb-2">
                       {project.name}
                     </h3>
 
-                    <p className="text-slate-400 mb-6 line-clamp-3 text-sm">
+                    <p className="text-slate-500 mb-4 line-clamp-2 text-sm">
                       {project.content}
                     </p>
-
-                    {project.architecture && (
-                      <div className="mb-6 p-4 bg-slate-950/50 rounded-xl border border-slate-800">
-                        <div className="text-[10px] font-mono text-purple-400 uppercase tracking-widest mb-2">Technical Architecture</div>
-                        <p className="text-xs text-slate-500 font-mono italic">
-                          {project.architecture}
-                        </p>
-                      </div>
-                    )}
                   </div>
 
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-3">
                     {project.githubUrl && (
-                      <Button size="sm" variant="outline" asChild className="border-slate-700 hover:border-purple-500 bg-transparent text-slate-300">
+                      <Button size="sm" variant="outline" asChild className="border-slate-700 text-slate-400 hover:text-white hover:border-slate-500 bg-transparent">
                         <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
-                          <Github className="h-4 w-4 mr-2" />
+                          <Github className="h-3.5 w-3.5 mr-1.5" />
                           Source
                         </a>
                       </Button>
                     )}
                     {project.url && (
-                      <Button size="sm" className="bg-purple-600 hover:bg-purple-700 text-white">
+                      <Button size="sm" className="bg-slate-800 hover:bg-slate-700 text-white border border-slate-700">
                         <a href={project.url} target="_blank" rel="noopener noreferrer" className="flex items-center">
-                          <ExternalLink className="h-4 w-4 mr-2" />
+                          <ExternalLink className="h-3.5 w-3.5 mr-1.5" />
                           Demo
                         </a>
                       </Button>
@@ -123,7 +112,7 @@ const Projects = () => {
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>
@@ -131,4 +120,4 @@ const Projects = () => {
   );
 };
 
-export default Projects;
+export default React.memo(Projects);

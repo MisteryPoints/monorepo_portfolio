@@ -1,0 +1,41 @@
+services:
+  portfolio-db:
+    image: postgres:16-alpine
+    container_name: portfolio-db
+    volumes:
+      - portfolio_pgdata:/var/lib/postgresql/data
+      - ./portfolio-backend/seed:/docker-entrypoint-initdb.d
+    environment:
+      POSTGRES_DB: portfolio
+      POSTGRES_USER: portfolio_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD?required}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U portfolio_user -d portfolio"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - portfolio_net
+    restart: unless-stopped
+
+  portfolio-api:
+    build:
+      context: ./portfolio-backend
+    container_name: portfolio-api
+    env_file: ./deploy/.env
+    depends_on:
+      portfolio-db:
+        condition: service_healthy
+    networks:
+      - portfolio_net
+      - nginx_net
+    restart: unless-stopped
+
+volumes:
+  portfolio_pgdata:
+
+networks:
+  portfolio_net:
+  nginx_net:
+    external: true
+    name: nginx_net

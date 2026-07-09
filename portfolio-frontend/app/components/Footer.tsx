@@ -1,6 +1,8 @@
 import { Github, Linkedin, Mail, Heart } from 'lucide-react';
+import { useTranslation } from '@/lib/translations';
 
 const Footer = () => {
+  const { t } = useTranslation();
   return (
     <footer className="bg-slate-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -19,9 +21,9 @@ const Footer = () => {
 
           <div className="text-center text-gray-400">
             <p className="flex items-center justify-center">
-              Made with <Heart className="mx-2 h-4 w-4 text-red-400" fill="currentColor" /> using React, TypeScript & Tailwind CSS
+              {t('footer.madeWith')} <Heart className="mx-2 h-4 w-4 text-red-400" fill="currentColor" /> {t('footer.using')}
             </p>
-            <p className="mt-2">&copy; {new Date().getFullYear()} Victor Tejada. All rights reserved.</p>
+            <p className="mt-2">&copy; {new Date().getFullYear()} Victor Tejada. {t('footer.rights')}</p>
           </div>
         </div>
       </div>

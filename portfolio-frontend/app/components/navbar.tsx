@@ -1,16 +1,29 @@
-import { ModeToggle } from "./mode-toggle" 
 import { useState, useEffect } from 'react';
 import { Link } from '@tanstack/react-router';
-import { Menu, X, Code, User, Briefcase, BookOpen, Mail } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/lib/translations';
+
+const sectionIds = ['hero', 'experience', 'skills', 'projects', 'blog', 'contact'] as const;
 
 const Navbar = () => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState('hero');
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
+
+      const scrollPos = window.scrollY + 100;
+      for (let i = sectionIds.length - 1; i >= 0; i--) {
+        const el = document.getElementById(sectionIds[i]);
+        if (el && el.offsetTop <= scrollPos) {
+          setActiveSection(sectionIds[i]);
+          break;
+        }
+      }
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -23,29 +36,35 @@ const Navbar = () => {
 
   return (
     <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-      scrolled ? 'bg-slate-900/95 backdrop-blur-sm shadow-lg' : 'bg-transparent'
+      scrolled ? 'bg-slate-950/80 backdrop-blur-md' : 'bg-transparent'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <div className="flex items-center space-x-2">
-            <Code className="h-8 w-8 text-purple-400" />
-            <span className="text-xl font-bold text-white">Victor Tejada</span>
+          <div className="flex items-center">
+            <span className="text-lg font-bold text-white tracking-tight">Victor Tejada</span>
           </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            <a href="#hero" className="text-gray-300 hover:text-purple-400 transition-colors cursor-pointer"><User className="h-4 w-4 inline mr-2" />About</a>
-            <a href="#projects" className="text-gray-300 hover:text-purple-400 transition-colors cursor-pointer"><Briefcase className="h-4 w-4 inline mr-2" />Projects</a>
-            <a href="#blog" className="text-gray-300 hover:text-purple-400 transition-colors cursor-pointer"><BookOpen className="h-4 w-4 inline mr-2" />Blog</a>
-            <a href="#contact" className="text-gray-300 hover:text-purple-400 transition-colors cursor-pointer"><Mail className="h-4 w-4 inline mr-2" />Contact</a>
-            <Link to="/Admin">
-              <Button variant="outline" size="sm" className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white">
-                Admin
+          <div className="hidden md:flex items-center space-x-1">
+            {sectionIds.map((id) => (
+              <button
+                key={id}
+                onClick={() => scrollToSection(id)}
+                className={`px-3 py-2 text-sm transition-colors ${
+                  activeSection === id
+                    ? 'text-white'
+                    : 'text-slate-500 hover:text-slate-300'
+                }`}
+              >
+                {t(`nav.${id === 'hero' ? 'about' : id}`)}
+              </button>
+            ))}
+            <Link to="/Admin" className="ml-4">
+              <Button variant="outline" size="sm" className="border-slate-700 text-slate-400 hover:text-white hover:border-slate-500 text-xs">
+                {t('nav.admin')}
               </Button>
             </Link>
           </div>
 
-          {/* Mobile menu button */}
           <div className="md:hidden">
             <Button
               variant="ghost"
@@ -53,31 +72,26 @@ const Navbar = () => {
               onClick={() => setIsOpen(!isOpen)}
               className="text-white"
             >
-              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
           </div>
         </div>
 
-        {/* Mobile Navigation */}
         {isOpen && (
-          <div className="md:hidden bg-slate-900/95 backdrop-blur-sm">
+          <div className="md:hidden bg-slate-950/95 backdrop-blur-md border-t border-slate-800">
             <div className="px-2 pt-2 pb-3 space-y-1">
-              <button onClick={() => scrollToSection('hero')} className="block px-3 py-2 text-gray-300 hover:text-purple-400">
-                About
-              </button>
-              <button onClick={() => scrollToSection('projects')} className="block px-3 py-2 text-gray-300 hover:text-purple-400">
-                Projects
-              </button>
-              <button onClick={() => scrollToSection('blog')} className="block px-3 py-2 text-gray-300 hover:text-purple-400">
-                Blog
-              </button>
-              <button onClick={() => scrollToSection('contact')} className="block px-3 py-2 text-gray-300 hover:text-purple-400">
-                Contact
-              </button>
-              <Link to="/Admin" className="block px-3 py-2 text-purple-400">
-                Admin Panel
+              {sectionIds.map((id) => (
+                <button
+                  key={id}
+                  onClick={() => scrollToSection(id)}
+                  className="block w-full text-left px-3 py-2 text-slate-400 hover:text-white transition-colors"
+                >
+                  {t(`nav.${id === 'hero' ? 'about' : id}`)}
+                </button>
+              ))}
+              <Link to="/Admin" className="block px-3 py-2 text-purple-400 text-sm">
+                {t('nav.admin')}
               </Link>
-              <ModeToggle />
             </div>
           </div>
         )}
@@ -87,4 +101,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-

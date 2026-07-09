@@ -1,7 +1,9 @@
-import React from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from '@/lib/translations';
 
 const HireMeCTA = () => {
+  const { t } = useTranslation();
+
   return (
     <div className="fixed left-4 bottom-4 z-50">
       <div className="relative w-32 h-32 flex items-center justify-center">
@@ -19,7 +21,7 @@ const HireMeCTA = () => {
           />
           <text className="text-[10px] font-bold uppercase tracking-widest fill-slate-400">
             <textPath xlinkHref="#circlePath" startOffset="0%">
-              Full Stack Developer • Available for Hire •
+              {t('hireMe.available')} •
             </textPath>
           </text>
         </motion.svg>
@@ -28,7 +30,7 @@ const HireMeCTA = () => {
           href="mailto:info@victortejada.dev"
           className="flex items-center justify-center bg-white text-black shadow-lg border border-solid border-black w-16 h-16 rounded-full font-semibold hover:bg-transparent hover:text-white hover:border-white transition-all duration-300 z-20 text-[10px]"
         >
-          Hire Me
+          {t('hireMe.button')}
         </a>
       </div>
     </div>
