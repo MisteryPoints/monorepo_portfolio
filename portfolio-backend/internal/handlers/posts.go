@@ -125,15 +125,17 @@ func AddPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !utils.IsValidURL(newPost.Link) {
+	if newPost.Link != "" && !utils.IsValidURL(newPost.Link) {
 		http.Error(w, "URL del post no es válida", http.StatusBadRequest)
 		return
 	}
 
-	var author models.Author
-	if err := database.DB.First(&author, "id = ?", newPost.AuthorID).Error; err != nil {
-		http.Error(w, "Autor no encontrado", http.StatusNotFound)
-		return
+	if newPost.AuthorID != "" {
+		var author models.Author
+		if err := database.DB.First(&author, "id = ?", newPost.AuthorID).Error; err != nil {
+			http.Error(w, "Autor no encontrado", http.StatusNotFound)
+			return
+		}
 	}
 
 	var verifiedBadges []string
@@ -305,11 +307,56 @@ func handleMultipartFormPost(w http.ResponseWriter, r *http.Request, post *model
 }
 
 func handleJSONPost(w http.ResponseWriter, r *http.Request, post *models.Post) {
-	if err := json.NewDecoder(r.Body).Decode(&post); err != nil {
+	var raw map[string]interface{}
+	if err := json.NewDecoder(r.Body).Decode(&raw); err != nil {
 		http.Error(w, "Error al leer el JSON del Post", http.StatusBadRequest)
 		return
 	}
+
+	if subject, ok := raw["subject"].(string); ok {
+		post.Subject = subject
+	} else if title, ok := raw["title"].(string); ok {
+		post.Subject = title
+	}
+
+	if content, ok := raw["content"].(string); ok {
+		post.Content = content
+	}
+
+	if authorId, ok := raw["authorId"].(string); ok {
+		post.AuthorID = authorId
+	}
+
+	if badges, ok := raw["badges"].([]interface{}); ok {
+		for _, b := range badges {
+			if s, ok := b.(string); ok {
+				post.Badges = append(post.Badges, s)
+			}
+		}
+	} else if tags, ok := raw["tags"].([]interface{}); ok {
+		for _, t := range tags {
+			if s, ok := t.(string); ok {
+				post.Badges = append(post.Badges, s)
+			}
+		}
+	}
+
+	if images, ok := raw["images"].([]interface{}); ok {
+		for _, img := range images {
+			if s, ok := img.(string); ok {
+				post.Images = append(post.Images, s)
+			}
+		}
+	}
 	if post.Images == nil {
 		post.Images = []string{}
+	}
+
+	if link, ok := raw["link"].(string); ok {
+		post.Link = link
+	}
+
+	if id, ok := raw["id"].(string); ok {
+		post.ID = id
 	}
 }

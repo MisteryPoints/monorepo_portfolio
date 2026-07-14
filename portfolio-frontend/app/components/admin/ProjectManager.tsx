@@ -29,7 +29,21 @@ const ProjectManager = () => {
     queryFn: async () => {
       const response = await fetch('/api/get-projects');
       if (!response.ok) throw new Error('Failed to fetch projects');
-      return response.json();
+      const data = await response.json();
+      return data.map((item: Record<string, unknown>) => ({
+        id: item.id as string,
+        title: (item.name || item.title) as string,
+        description: (item.content || item.description) as string,
+        technologies: Array.isArray(item.technologies)
+          ? (item.technologies as Array<Record<string, unknown>>).map((t: Record<string, unknown>) => (t.name || t) as string)
+          : [],
+        github_url: (item.githubUrl || item.github_url) as string | undefined,
+        live_url: (item.url || item.live_url) as string | undefined,
+        image_url: Array.isArray(item.images)
+          ? (item.images as string[])[0]
+          : (item.image_url as string | undefined),
+        created_at: (item.createdAt || item.created_at) as string,
+      }));
     },
   });
 

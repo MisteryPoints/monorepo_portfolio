@@ -35,10 +35,11 @@ const BlogForm = ({ post, onClose }: BlogFormProps) => {
     mutationFn: async (data: typeof formData) => {
       const url = post ? '/api/update-post' : '/api/add-post';
       const method = post ? 'PUT' : 'POST';
-      
-      const payload = {
-        ...data,
-        tags: data.tags.split(',').map(t => t.trim()).filter(Boolean),
+
+      const payload: Record<string, unknown> = {
+        subject: data.title,
+        content: data.content,
+        badges: data.tags.split(',').map(t => t.trim()).filter(Boolean),
         ...(post && { id: post.id }),
       };
 
@@ -50,7 +51,10 @@ const BlogForm = ({ post, onClose }: BlogFormProps) => {
         body: JSON.stringify(payload),
       });
 
-      if (!response.ok) throw new Error('Failed to save post');
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text || `Failed to save post (${response.status})`);
+      }
       return response.json();
     },
     onSuccess: () => {
@@ -61,10 +65,10 @@ const BlogForm = ({ post, onClose }: BlogFormProps) => {
       });
       onClose();
     },
-    onError: () => {
+    onError: (err) => {
       toast({
         title: "Error",
-        description: `Failed to ${post ? 'update' : 'create'} post`,
+        description: err instanceof Error ? err.message : `Failed to ${post ? 'update' : 'create'} post`,
         variant: "destructive",
       });
     },

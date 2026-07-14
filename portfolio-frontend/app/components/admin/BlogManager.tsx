@@ -30,7 +30,17 @@ const BlogManager = () => {
     queryFn: async () => {
       const response = await fetch('/api/get-posts');
       if (!response.ok) throw new Error('Failed to fetch posts');
-      return response.json();
+      const data = await response.json();
+      return data.map((item: Record<string, unknown>) => ({
+        id: item.id as string,
+        title: (item.subject || item.title) as string,
+        content: item.content as string,
+        tags: Array.isArray(item.badges || item.tags)
+          ? ((item.badges || item.tags) as string[])
+          : [],
+        created_at: (item.createdAt || item.created_at) as string,
+        author: item.author as { name: string } | undefined,
+      }));
     },
   });
 

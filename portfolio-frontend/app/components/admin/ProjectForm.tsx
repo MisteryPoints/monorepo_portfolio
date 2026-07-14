@@ -39,10 +39,14 @@ const ProjectForm = ({ project, onClose }: ProjectFormProps) => {
     mutationFn: async (data: typeof formData) => {
       const url = project ? '/api/update-project' : '/api/add-project';
       const method = project ? 'PUT' : 'POST';
-      
-      const payload = {
-        ...data,
-        technologies: data.technologies.split(',').map(t => t.trim()).filter(Boolean),
+
+      const payload: Record<string, unknown> = {
+        name: data.title,
+        content: data.description,
+        technologiesIds: data.technologies.split(',').map(t => t.trim()).filter(Boolean),
+        githubUrl: data.github_url,
+        url: data.live_url,
+        images: data.image_url ? [data.image_url] : [],
         ...(project && { id: project.id }),
       };
 
@@ -54,7 +58,10 @@ const ProjectForm = ({ project, onClose }: ProjectFormProps) => {
         body: JSON.stringify(payload),
       });
 
-      if (!response.ok) throw new Error('Failed to save project');
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text || `Failed to save project (${response.status})`);
+      }
       return response.json();
     },
     onSuccess: () => {
@@ -65,10 +72,10 @@ const ProjectForm = ({ project, onClose }: ProjectFormProps) => {
       });
       onClose();
     },
-    onError: () => {
+    onError: (err) => {
       toast({
         title: "Error",
-        description: `Failed to ${project ? 'update' : 'create'} project`,
+        description: err instanceof Error ? err.message : `Failed to ${project ? 'update' : 'create'} project`,
         variant: "destructive",
       });
     },

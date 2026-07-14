@@ -334,11 +334,77 @@ func handleMultipartFormProject(w http.ResponseWriter, r *http.Request, project 
 }
 
 func handleJSONProject(w http.ResponseWriter, r *http.Request, project *models.Project) {
-	if err := json.NewDecoder(r.Body).Decode(&project); err != nil {
+	var raw map[string]interface{}
+	if err := json.NewDecoder(r.Body).Decode(&raw); err != nil {
 		log.Println("Error al leer el JSON:", err)
 		http.Error(w, "Error al leer el JSON", http.StatusBadRequest)
+		return
+	}
+
+	if name, ok := raw["name"].(string); ok {
+		project.Name = name
+	} else if name, ok := raw["title"].(string); ok {
+		project.Name = name
+	}
+
+	if content, ok := raw["content"].(string); ok {
+		project.Content = content
+	} else if desc, ok := raw["description"].(string); ok {
+		project.Content = desc
+	}
+
+	if gh, ok := raw["githubUrl"].(string); ok {
+		project.GithubURL = gh
+	} else if gh, ok := raw["github_url"].(string); ok {
+		project.GithubURL = gh
+	}
+
+	if u, ok := raw["url"].(string); ok {
+		project.Url = u
+	} else if u, ok := raw["live_url"].(string); ok {
+		project.Url = u
+	}
+
+	if imgs, ok := raw["images"].([]interface{}); ok {
+		for _, img := range imgs {
+			if s, ok := img.(string); ok {
+				project.Images = append(project.Images, s)
+			}
+		}
+	} else if img, ok := raw["image_url"].(string); ok && img != "" {
+		project.Images = []string{img}
 	}
 	if project.Images == nil {
 		project.Images = []string{}
+	}
+
+	if techs, ok := raw["technologies"].([]interface{}); ok {
+		var ids []string
+		for _, t := range techs {
+			name, ok := t.(string)
+			if !ok || name == "" {
+				continue
+			}
+			var skill models.Skill
+			if err := database.DB.Where("LOWER(name) = LOWER(?)", name).First(&skill).Error; err != nil {
+				skill = models.Skill{
+					ID:       "skill-" + strings.ToLower(strings.ReplaceAll(name, " ", "-")),
+					Name:     name,
+					NameEN:   name,
+					NameES:   name,
+					Category: "other",
+				}
+				database.DB.Create(&skill)
+			}
+			ids = append(ids, skill.ID)
+		}
+		project.TechnologiesIds = ids
+		if len(ids) > 0 {
+			database.DB.Where("id IN ?", ids).Find(&project.Technologies)
+		}
+	}
+
+	if id, ok := raw["id"].(string); ok {
+		project.ID = id
 	}
 }
